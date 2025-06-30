@@ -1,4 +1,55 @@
-### Obtains composite maximum likelihood estimators for marginal Cox regression models with clustered interval-censored data
+#' Composite Maximum Likelihood Estimation for Marginal Cox Models with Clustered Interval-Censored Data
+#'
+#' Obtains composite maximum likelihood estimators for marginal Cox regression models
+#' with clustered interval-censored data. Supports optional stratification, clustering,
+#' time-varying covariates, and multiple methods for variance estimation.
+#'
+#' @param formula A formula object specifying the marginal Cox model (e.g., `Surv(start, stop, event) ~ covariates`). Required if \code{data} is unprocessed.
+#' @param data A \code{data.frame} or a pre-processed \code{list} with two elements:
+#'   \describe{
+#'     \item{\code{pointEstimation}}{A list containing: \code{l}, \code{u}, \code{u.star}, \code{tau}, \code{risk}, \code{x}, each a list of length S (number of strata).}
+#'     \item{\code{varMapping}}{Optional list of cluster-to-stratum mapping. Contains:
+#'       \code{stratum} (list of stratum IDs per cluster) and
+#'       \code{indiv} (list of individual IDs per cluster). May be \code{NULL} if not needed.}
+#'   }
+#' @param strata Character vector specifying stratification variable(s) in \code{data}.
+#' @param clus Character vector specifying clustering variable(s) in \code{data}.
+#' @param id Character name of the subject identifier variable, used if covariates are time-varying.
+#' @param variance Logical; whether to compute and return the variance-covariance matrix of regression coefficients.
+#' @param method Character string; either \code{"profile"} (default) or \code{"bootstrap"}, specifying the method for variance estimation.
+#' @param control A named list of EM algorithm control parameters:
+#'   \describe{
+#'     \item{\code{init}}{Initial values for coefficients and baseline hazard(s).}
+#'     \item{\code{tol}}{Convergence tolerance for the L1 norm of coefficient updates.}
+#'     \item{\code{maxit}}{Maximum number of EM iterations.}
+#'     \item{\code{c}}{Perturbation constant for numerical derivatives.}
+#'     \item{\code{trace}}{Logical; if \code{TRUE}, stores the full sequence of EM iterates.}
+#'   }
+#' @param boot.control A named list of bootstrap control parameters:
+#'   \describe{
+#'     \item{\code{perturb}}{Logical; whether to use perturbation bootstrap (\code{TRUE}) or nonparametric bootstrap (\code{FALSE}).}
+#'     \item{\code{resample.clusters}}{Logical; if \code{TRUE}, resample clusters instead of individuals. Used only if \code{clus} is specified.}
+#'     \item{\code{n.boot}}{Number of bootstrap replicates.}
+#'   }
+#' @param boot.data Optional list of pre-processed bootstrap datasets (only used if \code{data} is already processed and \code{perturb = FALSE}).
+#'
+#' @return A list of class \code{"compCoxIC"} with the following components:
+#' \describe{
+#'   \item{\code{call}}{The matched call.}
+#'   \item{\code{data.attr}}{List of data attributes: number of observations, strata, events.}
+#'   \item{\code{coefficients}}{Estimated regression coefficients.}
+#'   \item{\code{var}}{Variance-covariance matrix of coefficients, if requested.}
+#'   \item{\code{var.method}}{Method used for variance estimation ("profile" or "bootstrap").}
+#'   \item{\code{var.args}}{Arguments used for variance estimation.}
+#'   \item{\code{baseline.hazard}}{List of estimated baseline hazards, one per stratum.}
+#'   \item{\code{n.iter}}{Number of EM iterations completed.}
+#'   \item{\code{l1.norm}}{Final L1 norm of coefficient updates (used for convergence check).}
+#'   \item{\code{trace}}{Trace of EM iterations if \code{trace = TRUE}.}
+#'   \item{\code{fit.times}}{Time used for model fitting and variance estimation.}
+#' }
+#'
+#' @export
+
 composite_coxIC <- function(formula=NULL, data, strata=NULL, clus=NULL, id=NULL, variance=TRUE, method="profile", control=NULL, boot.control=NULL, boot.data=NULL){
 
   call <- match.call()
