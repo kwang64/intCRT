@@ -1,4 +1,21 @@
 ### Processes the input dataset
+
+#' Process Stratified Survival Data
+#' Main wrapper that processes a dataset with optional stratification and clustering.
+#'
+#' @param formula formula object for the stratified COX model
+#' @param data full set of observations
+#' @param strata vector indicating the stratification variables
+#' @param id individual subject identification variable
+#' @param clus vector indicating the clustering variable
+#'
+#' @return A list with two components
+#' \describe{
+#'   \item{pointEstimation}{A list containing processed data objects (like time intervals, risk sets, and covariates) ready for survival model estimation, organized by strata.}
+#'   \item{varMapping}{A list describing how clusters map to strata and individuals for variance estimation; or NULL if no clustering or stratification is used.}
+#' }
+#' @export
+#'
 process_data <- function(formula, data, strata, id, clus){
 
   row.names(data) <- 1:nrow(data)
@@ -72,7 +89,29 @@ process_data <- function(formula, data, strata, id, clus){
   return(list(pointEstimation=processed, varMapping=mapping))
 }
 
-### Processes the data for stratum s
+#' Process Data for a Single Stratum in Survival Analysis
+#'
+#' This function processes the input data for one stratum, extracting relevant
+#' time intervals, risk sets, and covariate matrices needed for stratified Cox modeling.
+#'
+#' @param formula A formula object specifying the survival model, typically
+#'   with start and stop times on the left side.
+#' @param data A data frame containing the observations for the given stratum.
+#' @param id Optional character string specifying the subject ID variable
+#'   for handling time-varying covariates. If NULL, assumes no time-varying covariates.
+#'
+#' @return A list containing the following components:
+#' \describe{
+#'   \item{l.s}{Vector of start times for each individual in the stratum.}
+#'   \item{u.s}{Vector of stop times (event or censoring times) for each individual.}
+#'   \item{u.s.star}{Modified stop times where infinite times are replaced by start times.}
+#'   \item{tau.s}{Sorted unique event or censoring times within the stratum.}
+#'   \item{risk.vr}{A matrix indicating risk sets for each time point (rows: individuals, columns: time points).}
+#'   \item{x.s}{A 3-dimensional array of covariate values for each individual and time point.}
+#' }
+#'
+#' @export
+
 process_data_s <- function(formula, data, id){
 
   # Determining relevant column names and indices
@@ -128,7 +167,24 @@ process_data_s <- function(formula, data, id){
 
 }
 
-### Determines the mapping between cluster membership and stratum membership
+#' Map Cluster Members to Their Corresponding Strata and Individuals
+#'
+#' This function determines how individuals within a given cluster correspond to
+#' strata and their positions within those strata. It creates mappings needed
+#' for variance estimation in stratified and clustered survival analysis.
+#'
+#' @param data A data frame containing observations for one cluster.
+#' @param stratum.list A list of data frames, each representing a stratum with processed data.
+#' @param strata Optional character string specifying the stratification variable.
+#' @param id Optional character string specifying the individual subject ID variable.
+#'
+#' @return A list with two components:
+#' \describe{
+#'   \item{stratum.id}{An integer vector indicating the stratum membership of each individual in the cluster.}
+#'   \item{indiv.id}{An integer vector indicating each individual's row index within their corresponding stratum data frame.}
+#' }
+#'
+#' @export
 cluster_to_stratum_mapping_i <- function(data, stratum.list, strata, id){
 
   # Identifying one unique row for each individual
