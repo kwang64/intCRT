@@ -1,4 +1,20 @@
-### Calculates the conditional expectation of the Poisson augmentation variables
+#' Calculate Conditional Expectations of Poisson Augmentation Variables
+#'
+#' Computes the conditional expectations of the latent Poisson augmentation variables \eqn{W_{svr}}
+#' used in the E-step of the composite EM algorithm for marginal Cox regression.
+#'
+#' @param l List. Left endpoints \code{l.s} for each stratum.
+#' @param u List. Right endpoints \code{u.s} for each stratum.
+#' @param tau List. Unique time points \code{tau.s} for each stratum.
+#' @param x List. Covariate arrays \code{x.s} for each stratum.
+#' @param lambda List. Current estimates of the baseline hazards \code{lambda.s} for each stratum.
+#' @param beta Numeric vector. Current fixed effect estimates.
+#'
+#' @return A list of matrices \code{w.s}, one for each stratum, where each matrix contains
+#' the conditional expectations \eqn{E[W_{svr} | data]}.
+#'
+#' @seealso \code{\link{w_s}}, \code{\link{point_iter}}
+#' @export
 calc_w <- function(l, u, tau, x, lambda, beta){
 
   # Taking the projection of w.s for each stratum
@@ -8,7 +24,23 @@ calc_w <- function(l, u, tau, x, lambda, beta){
 
 }
 
-### Returns the matrix of projected w.s for stratum s
+#' Compute Projected Poisson Expectations for One Stratum
+#'
+#' For a given stratum, computes a matrix of conditional expectations \eqn{w_{svr}}
+#' for each subject and time point.
+#'
+#' @param l.s Numeric vector. Left endpoints for individuals in the stratum.
+#' @param u.s Numeric vector. Right endpoints for individuals in the stratum.
+#' @param tau.s Numeric vector. Time points in the stratum.
+#' @param x.s Array. Covariate data \code{x.s} for the stratum; dimensions are individuals × covariates × time points.
+#' @param lambda.s Numeric vector. Current baseline hazard estimates for the stratum.
+#' @param beta Numeric vector. Current fixed effect estimates.
+#'
+#' @return A matrix with one row per individual and one column per time point \code{tau.s},
+#' containing the expected values \eqn{E[W_{svr} | data]}.
+#'
+#' @seealso \code{\link{w_sv}}, \code{\link{calc_w}}
+#' @export
 w_s <- function(l.s, u.s, tau.s, x.s, lambda.s, beta){
 
   # Taking the projection of w.sv for each individual
@@ -17,7 +49,22 @@ w_s <- function(l.s, u.s, tau.s, x.s, lambda.s, beta){
 
 }
 
-### Returns the vector w.sv for individual v in stratum s
+#' Compute Expected Poisson Variables for One Individual
+#'
+#' Computes the vector of expected latent Poisson variables \eqn{w_{svr}} for a single individual
+#' in a stratum, used in the E-step of the EM algorithm.
+#'
+#' @param l.sv Numeric. Left endpoint of the interval for the individual.
+#' @param u.sv Numeric. Right endpoint of the interval for the individual.
+#' @param tau.s Numeric vector. Sorted time points for the stratum.
+#' @param x.pr Matrix. Covariate matrix for the individual (covariates × time points).
+#' @param lambda.s Numeric vector. Current baseline hazard estimates for the stratum.
+#' @param beta Numeric vector. Current fixed effect estimates.
+#'
+#' @return A numeric vector of length \code{length(tau.s)} with conditional expectations \eqn{w_{svr}}.
+#'
+#' @seealso \code{\link{w_s}}, \code{\link{calc_w}}
+#' @export
 w_sv <- function(l.sv, u.sv, tau.s, x.pr, lambda.s, beta){
 
   # Initializing the vector of projections for all W_svr such that tau_sr <= L_sv
