@@ -49,8 +49,6 @@ Computes the composite score function for the fixed effects \code{beta} across a
 by summing the stratum-level profile composite likelihood score contributions.
 }
 \seealso{
-\code{\link{update_beta}}, \code{\link{x_bar_s}}
-
 \code{\link{x_bar_s}}, \code{\link{score}}, \code{\link{update_beta}}
 }
 \keyword{(gradient}

@@ -13,7 +13,7 @@
 #' If \code{NULL}, defaults to equal weights for all individuals.
 #'
 #' @return A numeric vector of updated \code{beta} values (length \code{p}).
-#'
+#' @export
 update_beta <- function(beta, u.star, tau, x, w, risk, weights=NULL){
 
   if (is.null(weights)){
@@ -40,7 +40,7 @@ update_beta <- function(beta, u.star, tau, x, w, risk, weights=NULL){
 #'
 #' @return A numeric vector of length \code{p}, representing the total score contributions for each covariate across all strata.
 #'
-#' @seealso \code{\link{update_beta}}, \code{\link{x_bar_s}}
+#' @export
 #'
 #' @keywords internal
 
@@ -68,7 +68,7 @@ beta_score <- function(beta, u.star, tau, x, w, risk, weights){
   #'
   #' @keywords internal
   #' @seealso \code{\link{x_bar_s}}, \code{\link{score}}, \code{\link{update_beta}}
-  #'
+  #' @export
   score_s <- function(beta, u.s.star, tau.s, x.s, w.s, risk.vr, weights.s){
 
     # Determining the weight matrix for each individual at each timepoint
@@ -105,7 +105,7 @@ beta_score <- function(beta, u.star, tau, x, w, risk, weights){
 #' @return A matrix of dimension \code{rho.s x p}, where each row gives the mean covariate vector at a specific timepoint.
 #'
 #' @keywords internal
-#'
+#' @export
 x_bar_s <- function(beta, u.s.star, tau.s, x.s, risk.vr, weights.s){
 
   # Returns a matrix with rows corresponding to individuals and columns to timepoints
@@ -132,7 +132,7 @@ x_bar_s <- function(beta, u.s.star, tau.s, x.s, risk.vr, weights.s){
 #' @param weights Optional list of length \eqn{S}, where each element is a numeric vector of perturbation weights \code{weights.s} for the corresponding stratum. If \code{NULL}, equal weights are assumed.
 #'
 #' @return A list of length \eqn{S}, where each element is a numeric vector of updated baseline hazard estimates \eqn{\lambda_{sr}} for stratum \eqn{s}.
-#'
+#' @export
 #' @keywords internal
 
 update_lambda <- function(beta, x, w, risk, weights=NULL){
@@ -159,7 +159,7 @@ update_lambda <- function(beta, x, w, risk, weights=NULL){
 #' @param weights.s Numeric vector of length \eqn{n_s}, containing perturbation weights for each individual in stratum \eqn{s}.
 #'
 #' @return A numeric vector of length \eqn{\rho_s}, containing the updated baseline hazard estimates \eqn{\lambda_{sr}} for stratum \eqn{s}.
-#'
+#' @export
 #' @keywords internal
 
 update_lambda_s <- function(beta, x.s, w.s, risk.vr, weights.s){

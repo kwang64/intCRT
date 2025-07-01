@@ -15,7 +15,7 @@
 #' }
 #'
 #' @return Numeric. The overall composite log-likelihood across all strata or clusters.
-#'
+#' @export
 composite <- function(beta, lambda, l, u, tau, x, mapping=NULL){
 
   # If no mapping is provided, the clustering and stratification variable(s) is(are) assumed to be the same
@@ -50,6 +50,7 @@ composite <- function(beta, lambda, l, u, tau, x, mapping=NULL){
 #' is then calculated as the sum of these individual contributions.
 #'
 #' @keywords internal
+#' @export
 composite_i_1 <- function(beta, lambda.i, l.i, u.i, tau.i, x.i){
 
   # Computing and aggregating the individual contributions to the cluster-specific composite likelihood
@@ -80,6 +81,7 @@ composite_i_1 <- function(beta, lambda.i, l.i, u.i, tau.i, x.i){
 #' extracts the corresponding data, and evaluates the individual composite log-likelihood contribution using \code{\link{composite_ij}}.
 #'
 #' @keywords internal
+#' @export
 composite_i_2 <- function(beta, lambda, l, u, tau, x, stratum.i, indiv.i){
 
   # Computing and aggregating the individual contributions to the cluster-specific composite likelihood
@@ -104,7 +106,7 @@ composite_i_2 <- function(beta, lambda, l, u, tau, x, stratum.i, indiv.i){
 #' @param beta Numeric vector. Current estimates of the fixed effect coefficients (length \eqn{p}).
 #'
 #' @return Numeric. The composite log-likelihood contribution of individual \eqn{j} in cluster \eqn{i}.
-#'
+#' @export
 #' @details The function computes two terms:
 #' \enumerate{
 #'   \item The cumulative hazard up to the left endpoint \eqn{L_{ij}}.
