@@ -1,4 +1,24 @@
-### Summarizes the fitted Cox proportional hazards model
+#' Summarize a Fitted Composite Cox Proportional Hazards Model
+#'
+#' Prints a summary of the fitted Cox proportional hazards model returned by \code{composite_coxIC()},
+#' including data attributes, regression coefficients, hazard ratios, standard errors, z-statistics,
+#' p-values, and significance stars.
+#'
+#' @param x List. Model output from \code{composite_coxIC()} containing estimated coefficients, variance,
+#'   variance method, data attributes, and call information.
+#'
+#' @details
+#' The summary prints the total number of subjects, clusters, strata, and events used in the model.
+#' Regression coefficients and their standard errors are displayed alongside hazard ratios
+#' (\eqn{\exp(\beta)}) with associated z-scores and p-values. Significance levels are annotated as
+#' \code{***} (p < 0.001), \code{**} (p < 0.01), \code{*} (p < 0.05), \code{.} (p < 0.1), or blank otherwise.
+#' If variance estimates are unavailable, related statistics are shown as NA.
+#'
+#' Additionally, the method used for variance estimation is described (profile composite likelihood or bootstrap).
+#'
+#' @return Invisibly returns \code{x} after printing the summary.
+#'
+#' @export
 summary.compCoxIC <- function(x){
 
   # Summarizing data attributes
@@ -60,7 +80,31 @@ summary.compCoxIC <- function(x){
   }
 }
 
-### Plots the estimated baseline cumulative hazard (survival) function(s)
+#' Plot Estimated Baseline Cumulative Hazard, Survival, or Cumulative Incidence Functions
+#'
+#' Visualizes the estimated baseline distribution functions from the output of \code{composite_coxIC()}.
+#' Users can plot cumulative hazard, survival, or cumulative incidence functions, either combined on one plot
+#' or separately by stratum.
+#'
+#' @param x List. Model output from \code{composite_coxIC()}, containing baseline hazard estimates by stratum.
+#' @param type Character vector. Which baseline distribution function(s) to plot. Options include
+#'   \code{"cumulative hazard"}, \code{"survival"}, and \code{"cumulative incidence"}. Can specify multiple.
+#' @param combine Logical. If \code{TRUE}, plots all strata on a single combined plot. If \code{FALSE},
+#'   plots separate plots for each stratum.
+#' @param x.title Character. Label for the x-axis (default \code{"Time"}).
+#' @param legend.title Character. Title for the legend indicating strata (default \code{"Stratum"}).
+#' @param y.title Optional character vector of length matching \code{type} to customize y-axis titles.
+#'   If \code{NULL}, default titles will be used.
+#'
+#' @return NULL. This function prints ggplot2 plots to the current graphics device.
+#'
+#' @details
+#' The function computes cumulative sums of the estimated baseline hazard to derive cumulative hazard,
+#' survival (via \eqn{\exp(-\text{cumulative hazard})}), or cumulative incidence (via \eqn{1-\exp(-\text{cumulative hazard})}).
+#' Multiple types can be plotted by specifying them in \code{type}.
+#'
+#' @import ggplot2
+#' @export
 plot.compCoxIC <- function(x, type=c("cumulative hazard", "survival", "cumulative incidence"), combine=TRUE, x.title="Time", legend.title="Stratum", y.title=NULL){
 
   if (combine){
