@@ -14,7 +14,7 @@ em_init(p, tau)
 \value{
 A list with two components
 \describe{
-\item{beta}{A list of vector 0s with length of \code{p}, representing initialized coefficients }
+\item{beta}{A numeric vector 0s with length of \code{p}, representing initialized coefficients }
 \item{lambda}{a list of vectors where each vector has an initial baseline hazard value (1/length of tau.s) } }
 }
 \description{
