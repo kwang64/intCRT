@@ -1,5 +1,5 @@
 ---
-title: "comCoxIC_Intro"
+title: "Getting Started with compCoxIC "
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{comCoxIC_Intro}
@@ -17,3 +17,5 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(BCPP.Package)
 ```
+
+##Introduction 
