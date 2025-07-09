@@ -21,40 +21,71 @@ library(BCPP.Package)
 
 ## Overview
 
-This vignette demonstrates how to fit marginal Cox models to clustered, interval-censored data using the composite_coxIC() function. We highlight an example using time-dependent covariates with a pre-generated dataset containing 200 clusters and four strata.
+This vignette demonstrates how to use the functions in this package to estimate marginal Cox proportional hazards models for clustered interval-censored data, incorporating time-dependent covariates and stratification. The methodology is based on the composite likelihood framework developed in Cook et al. (2023).
+
 This package also show how to generate simulated data that mimics the Bostwana Combination Prevention Project(BCPP) structure, using included data generation utilities.
 
-## Getting started with `{intervalCRT}`
-```{r}
-library(BCPP.Package)
-```
-
-
-## Simulating Clustered Interval-Censored Data
-
-The following functions allow you to simulate baseline hazards and clustered, interval-censored survival data. For example, we fist simulate a dataset with
-
-- 200 clusters of 20–30 individuals
-
-- 4 strata
-
-- 2 covariates: treat and utt
+## Simulating Data with Time-Dependent Covariates
+We begin by simulating data from a clustered interval-censored survival model with time-varying covariates.
 
 ```{r}
 set.seed(112358)
-baseline <- lapply(1:4, function(i) return_baseline(320, 8))
 
+# Generate baseline hazard functions for each of 4 strata
+baseline <- lapply(1:4, function(i) return_baseline(maxT = 320, knots = 8))
+
+# Define stratification function
+stratum_assign <- function(s) sample(1:4, s, replace = TRUE)
+
+# Simulate the data
 data <- gen_time_varying_cov(
-  n.groups = 200,
+  s = 200,
   group.size.range = c(20, 30),
   beta = c(-1, 0.5, 0),
   visits.generator = gen_visits,
   censoring.rate = 0,
   rho = 0.5,
   baseline = baseline,
-  S = function(s) sample(1:4, s, replace = TRUE)
+  S = stratum_assign
 )
 
 head(data)
 ```
 
+## Fitting the Model (without variance estimation)
+
+```{r}
+tdc_model_fit <- composite_coxIC(
+  formula = Surv(left, right, type = "interval2") ~ treat + utt,
+  data = data,
+  strata = "stratum",
+  clus = "group",
+  id = "id",
+  variance = FALSE
+)
+
+summary(tdc_model_fit)
+```
+
+## Visualizing the Baseline Functions
+```{r}
+plot(tdc_model_fit,
+     type = c("cumulative hazard", "survival", "cumulative incidence"),
+     combine = TRUE,
+     x.title = "Time", legend.title = "Stratum")
+```
+
+## Fitting the Model (with variance estimation)
+```{r}
+tdc_model_fit_var <- composite_coxIC(
+  formula = Surv(left, right, type = "interval2") ~ treat + utt,
+  data = data,
+  strata = "stratum",
+  clus = "group",
+  id = "id",
+  variance = TRUE
+)
+
+summary(tdc_model_fit_var)
+
+```
