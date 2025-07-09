@@ -2,26 +2,21 @@
 % Please edit documentation in R/0_Data_Generation_random_baseline.R
 \name{g}
 \alias{g}
-\title{Compute Gamma Term for Positive Stable Distribution}
+\title{Positive Stable Distribution Constant}
 \usage{
 g(a)
 }
 \arguments{
-\item{a}{Numeric. The index parameter \eqn{\alpha} (0 < \eqn{\alpha} < 1) of the desired positive stable distribution.}
+\item{a}{Numeric. Index parameter \eqn{\alpha} of the desired positive stable distribution (0 < a < 1).}
 }
 \value{
-Numeric. The value of \eqn{\gamma(\alpha)}, computed as \eqn{|1 - i \tan(\pi \alpha / 2)|^{-1/\alpha}}.
+Numeric. Value of the constant \eqn{\gamma}.
 }
 \description{
-Derives the expression for the scaling constant \eqn{\gamma(\alpha)} in the characteristic function
-of a positive stable distribution, based on the index parameter \eqn{\alpha}.
-}
-\details{
-This function is used in the characteristic function formulation of a positive \eqn{\alpha}-stable distribution.
-It relies on complex arithmetic involving the imaginary unit \eqn{i = \sqrt{-1}}.
+Computes the normalization constant \eqn{\gamma} in the positive stable distribution
+with index parameter \eqn{\alpha}.
 }
 \examples{
 g(0.5)
-g(0.8)
 
 }

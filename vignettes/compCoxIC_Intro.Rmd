@@ -1,8 +1,9 @@
 ---
-title: "Getting Started with compCoxIC "
+title: "Fitting Marginal Cox Models with Clustered Interval-Censored Data"
+author: ""
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{comCoxIC_Intro}
+  %\VignetteIndexEntry{Fitting Marginal Cox Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,4 +19,42 @@ knitr::opts_chunk$set(
 library(BCPP.Package)
 ```
 
-##Introduction 
+## Overview
+
+This vignette demonstrates how to fit marginal Cox models to clustered, interval-censored data using the composite_coxIC() function. We highlight an example using time-dependent covariates with a pre-generated dataset containing 200 clusters and four strata.
+This package also show how to generate simulated data that mimics the Bostwana Combination Prevention Project(BCPP) structure, using included data generation utilities.
+
+## Getting started with `{intervalCRT}`
+```{r}
+library(BCPP.Package)
+```
+
+
+## Simulating Clustered Interval-Censored Data
+
+The following functions allow you to simulate baseline hazards and clustered, interval-censored survival data. For example, we fist simulate a dataset with
+
+- 200 clusters of 20–30 individuals
+
+- 4 strata
+
+- 2 covariates: treat and utt
+
+```{r}
+set.seed(112358)
+baseline <- lapply(1:4, function(i) return_baseline(320, 8))
+
+data <- gen_time_varying_cov(
+  n.groups = 200,
+  group.size.range = c(20, 30),
+  beta = c(-1, 0.5, 0),
+  visits.generator = gen_visits,
+  censoring.rate = 0,
+  rho = 0.5,
+  baseline = baseline,
+  S = function(s) sample(1:4, s, replace = TRUE)
+)
+
+head(data)
+```
+

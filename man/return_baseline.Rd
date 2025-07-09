@@ -2,34 +2,38 @@
 % Please edit documentation in R/0_Data_Generation_random_baseline.R
 \name{return_baseline}
 \alias{return_baseline}
-\title{Generate Baseline Survival, Density, and Hazard Functions}
+\title{Generate Random Baseline Survival and Hazard Functions}
 \usage{
 return_baseline(maxT, knots, max.grid.width = 0.001, min.grid.number = 16000)
 }
 \arguments{
-\item{maxT}{Numeric. The maximum observed time (end of follow-up).}
+\item{maxT}{Numeric. Upper bound of the support for the failure time distribution.}
 
-\item{knots}{Integer. Number of internal knots to use when generating random anchor points.}
+\item{knots}{Integer. Number of internal knots used for spline representation of the survival function.}
 
-\item{max.grid.width}{Numeric. Maximum spacing between grid points for time discretization. Default is 0.001.}
+\item{max.grid.width}{Numeric. Maximum size of intervals in the time grid (default = 0.001).}
 
-\item{min.grid.number}{Integer. Minimum number of grid points. Default is 16000.}
+\item{min.grid.number}{Integer. Minimum number of intervals in the time grid (default = 16000).}
 }
 \value{
-A list with three data frames:
+A list with three elements:
 \describe{
-\item{survival}{Data frame with columns \code{time} and \code{surv}, representing the baseline survival function.}
-\item{density}{Data frame with columns \code{time} and \code{density}, representing the baseline density function.}
-\item{hazard}{Data frame with columns \code{time} and \code{hazard}, representing the baseline hazard function.}
+\item{survival}{A data frame with time points and corresponding survival probabilities \eqn{S(t)}.}
+\item{density}{A data frame with time points and corresponding density values \eqn{f(t) = \lambda(t) S(t)}.}
+\item{hazard}{A data frame with time points and corresponding hazard values \eqn{\lambda(t)}.}
 }
 }
 \description{
-Constructs piecewise-constant approximations of the baseline survival, density, and hazard functions
-using a monotonic cubic spline interpolation of randomly selected anchor points.
+Randomly generates a non-increasing baseline survival function \eqn{S(t)}
+on the interval \eqn{[0, T]} and returns the corresponding hazard and density
+functions.
+}
+\details{
+The survival function is constructed via a monotonic cubic spline interpolation
+through randomly selected anchor points.
 }
 \examples{
-result <- return_baseline(maxT = 5, knots = 3)
+result <- return_baseline(maxT = 10, knots = 5)
 head(result$survival)
-head(result$hazard)
 
 }

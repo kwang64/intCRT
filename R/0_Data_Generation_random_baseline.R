@@ -1,24 +1,27 @@
-#' Generate Baseline Survival, Density, and Hazard Functions
+#' Generate Random Baseline Survival and Hazard Functions
 #'
-#' Constructs piecewise-constant approximations of the baseline survival, density, and hazard functions
-#' using a monotonic cubic spline interpolation of randomly selected anchor points.
+#' Randomly generates a non-increasing baseline survival function \eqn{S(t)}
+#' on the interval \eqn{[0, T]} and returns the corresponding hazard and density
+#' functions.
 #'
-#' @param maxT Numeric. The maximum observed time (end of follow-up).
-#' @param knots Integer. Number of internal knots to use when generating random anchor points.
-#' @param max.grid.width Numeric. Maximum spacing between grid points for time discretization. Default is 0.001.
-#' @param min.grid.number Integer. Minimum number of grid points. Default is 16000.
+#' The survival function is constructed via a monotonic cubic spline interpolation
+#' through randomly selected anchor points.
 #'
-#' @return A list with three data frames:
+#' @param maxT Numeric. Upper bound of the support for the failure time distribution.
+#' @param knots Integer. Number of internal knots used for spline representation of the survival function.
+#' @param max.grid.width Numeric. Maximum size of intervals in the time grid (default = 0.001).
+#' @param min.grid.number Integer. Minimum number of intervals in the time grid (default = 16000).
+#'
+#' @return A list with three elements:
 #' \describe{
-#'   \item{survival}{Data frame with columns \code{time} and \code{surv}, representing the baseline survival function.}
-#'   \item{density}{Data frame with columns \code{time} and \code{density}, representing the baseline density function.}
-#'   \item{hazard}{Data frame with columns \code{time} and \code{hazard}, representing the baseline hazard function.}
+#'   \item{survival}{A data frame with time points and corresponding survival probabilities \eqn{S(t)}.}
+#'   \item{density}{A data frame with time points and corresponding density values \eqn{f(t) = \lambda(t) S(t)}.}
+#'   \item{hazard}{A data frame with time points and corresponding hazard values \eqn{\lambda(t)}.}
 #' }
 #'
 #' @examples
-#' result <- return_baseline(maxT = 5, knots = 3)
+#' result <- return_baseline(maxT = 10, knots = 5)
 #' head(result$survival)
-#' head(result$hazard)
 #'
 #' @export
 
@@ -60,35 +63,31 @@ return_baseline <- function(maxT, knots, max.grid.width=0.001, min.grid.number=1
               hazard=data.frame(time=timeGrid, hazard=hazGrid)))
 }
 
-#' Generate Exponential Baseline Survival, Density, and Hazard Functions
+#' Generate Exponential Baseline Survival and Hazard Functions
 #'
-#' Constructs piecewise-constant approximations of the baseline survival, density, and hazard functions
-#' under an exponential hazard model with a Gaussian frailty term.
+#' Generates baseline survival, hazard, and density functions under the
+#' exponential model with stratum-specific hazard variation.
+#'
+#' The hazard is modeled as \eqn{\lambda(t) = \lambda_0 e^b}, where \eqn{b \sim N(0, \alpha)}.
 #'
 #' @param maxT Numeric. Upper bound of the support for the failure time distribution.
 #' @param lambda0 Numeric. Baseline hazard rate.
-#' @param alpha Numeric. Variance of the Gaussian random effect (frailty) on the log-hazard scale.
-#' @param max.grid.width Numeric. Maximum width between grid points in the time grid. Default is 0.001.
-#' @param min.grid.number Integer. Minimum number of intervals in the time grid. Default is 16000.
+#' @param alpha Numeric. Variance of the random effect added to the log-hazard.
+#' @param max.grid.width Numeric. Maximum size of intervals in the time grid (default = 0.001).
+#' @param min.grid.number Integer. Minimum number of intervals in the time grid (default = 16000).
 #'
-#' @return A list with three data frames:
+#' @return A list with three elements:
 #' \describe{
-#'   \item{survival}{Data frame with columns \code{time} and \code{surv}, representing the baseline survival function.}
-#'   \item{density}{Data frame with columns \code{time} and \code{density}, representing the baseline density function.}
-#'   \item{hazard}{Data frame with columns \code{time} and \code{hazard}, representing the baseline hazard function.}
+#'   \item{survival}{A data frame with time points and corresponding survival probabilities \eqn{S(t)}.}
+#'   \item{density}{A data frame with time points and corresponding density values \eqn{f(t) = \lambda(t) S(t)}.}
+#'   \item{hazard}{A data frame with time points and corresponding hazard values \eqn{\lambda(t)}.}
 #' }
 #'
-#' @details The function simulates a frailty-adjusted constant hazard using a single draw \eqn{b \sim N(0, \alpha)},
-#' leading to a hazard function of the form \eqn{\lambda_0 \exp(b)}.
-#'
 #' @examples
-#' set.seed(1)
-#' result <- return_exp_baseline(maxT = 10, lambda0 = 0.3, alpha = 0.2)
-#' head(result$survival)
+#' result <- return_exp_baseline(maxT = 10, lambda0 = 0.1, alpha = 0.5)
 #' head(result$hazard)
 #'
 #' @export
-
 
 return_exp_baseline <- function(maxT, lambda0, alpha, max.grid.width=0.001, min.grid.number=16000){
 
@@ -104,21 +103,17 @@ return_exp_baseline <- function(maxT, lambda0, alpha, max.grid.width=0.001, min.
 }
 
 
-#' Compute Gamma Term for Positive Stable Distribution
+#' Positive Stable Distribution Constant
 #'
-#' Derives the expression for the scaling constant \eqn{\gamma(\alpha)} in the characteristic function
-#' of a positive stable distribution, based on the index parameter \eqn{\alpha}.
+#' Computes the normalization constant \eqn{\gamma} in the positive stable distribution
+#' with index parameter \eqn{\alpha}.
 #'
-#' @param a Numeric. The index parameter \eqn{\alpha} (0 < \eqn{\alpha} < 1) of the desired positive stable distribution.
+#' @param a Numeric. Index parameter \eqn{\alpha} of the desired positive stable distribution (0 < a < 1).
 #'
-#' @return Numeric. The value of \eqn{\gamma(\alpha)}, computed as \eqn{|1 - i \tan(\pi \alpha / 2)|^{-1/\alpha}}.
-#'
-#' @details This function is used in the characteristic function formulation of a positive \eqn{\alpha}-stable distribution.
-#' It relies on complex arithmetic involving the imaginary unit \eqn{i = \sqrt{-1}}.
+#' @return Numeric. Value of the constant \eqn{\gamma}.
 #'
 #' @examples
 #' g(0.5)
-#' g(0.8)
 #'
 #' @export
 

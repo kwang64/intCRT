@@ -2,7 +2,7 @@
 % Please edit documentation in R/0_Data_Generation_random_baseline.R
 \name{return_exp_baseline}
 \alias{return_exp_baseline}
-\title{Generate Exponential Baseline Survival, Density, and Hazard Functions}
+\title{Generate Exponential Baseline Survival and Hazard Functions}
 \usage{
 return_exp_baseline(
   maxT,
@@ -17,32 +17,29 @@ return_exp_baseline(
 
 \item{lambda0}{Numeric. Baseline hazard rate.}
 
-\item{alpha}{Numeric. Variance of the Gaussian random effect (frailty) on the log-hazard scale.}
+\item{alpha}{Numeric. Variance of the random effect added to the log-hazard.}
 
-\item{max.grid.width}{Numeric. Maximum width between grid points in the time grid. Default is 0.001.}
+\item{max.grid.width}{Numeric. Maximum size of intervals in the time grid (default = 0.001).}
 
-\item{min.grid.number}{Integer. Minimum number of intervals in the time grid. Default is 16000.}
+\item{min.grid.number}{Integer. Minimum number of intervals in the time grid (default = 16000).}
 }
 \value{
-A list with three data frames:
+A list with three elements:
 \describe{
-\item{survival}{Data frame with columns \code{time} and \code{surv}, representing the baseline survival function.}
-\item{density}{Data frame with columns \code{time} and \code{density}, representing the baseline density function.}
-\item{hazard}{Data frame with columns \code{time} and \code{hazard}, representing the baseline hazard function.}
+\item{survival}{A data frame with time points and corresponding survival probabilities \eqn{S(t)}.}
+\item{density}{A data frame with time points and corresponding density values \eqn{f(t) = \lambda(t) S(t)}.}
+\item{hazard}{A data frame with time points and corresponding hazard values \eqn{\lambda(t)}.}
 }
 }
 \description{
-Constructs piecewise-constant approximations of the baseline survival, density, and hazard functions
-under an exponential hazard model with a Gaussian frailty term.
+Generates baseline survival, hazard, and density functions under the
+exponential model with stratum-specific hazard variation.
 }
 \details{
-The function simulates a frailty-adjusted constant hazard using a single draw \eqn{b \sim N(0, \alpha)},
-leading to a hazard function of the form \eqn{\lambda_0 \exp(b)}.
+The hazard is modeled as \eqn{\lambda(t) = \lambda_0 e^b}, where \eqn{b \sim N(0, \alpha)}.
 }
 \examples{
-set.seed(1)
-result <- return_exp_baseline(maxT = 10, lambda0 = 0.3, alpha = 0.2)
-head(result$survival)
+result <- return_exp_baseline(maxT = 10, lambda0 = 0.1, alpha = 0.5)
 head(result$hazard)
 
 }
