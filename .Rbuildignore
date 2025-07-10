@@ -1,2 +1,4 @@
 ^BCPP\.Package\.Rproj$
 ^\.Rproj\.user$
+^doc$
+^Meta$

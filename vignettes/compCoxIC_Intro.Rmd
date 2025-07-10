@@ -6,6 +6,7 @@ vignette: >
   %\VignetteIndexEntry{Fitting Marginal Cox Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+depends: [BCPP.Package]
 ---
 
 ```{r, include = FALSE}

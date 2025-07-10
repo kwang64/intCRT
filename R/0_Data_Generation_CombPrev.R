@@ -329,8 +329,8 @@ gen_time_dependent_beta_tx <- function(M, ni, beta, beta.args, gen_visits, cens,
       networks.cm <- cumsum(networks)
       n.i <- sample(ni[1]:ni[2], 1)
       sub.ni <- networks[networks.cm < n.i]
-      copula.fn.list <- lapply(sub.ni, FUN=function(x) claytonCopula(-2*rho/(rho-1), dim = x))
-      u <- do.call(c, lapply(copula.fn.list, FUN=function(x) as.numeric(rCopula(1, x))))
+      copula.fn.list <- lapply(sub.ni, FUN=function(x) copula::claytonCopula(-2*rho/(rho-1), dim = x))
+      u <- do.call(c, lapply(copula.fn.list, FUN=function(x) as.numeric(copula::rCopula(1, x))))
       temp <- matrix(NA, nrow=length(u), ncol=3)
       temp[, 1] <- i; temp[, 2] <- u; temp[, 3] <- tx.sequence[i]
       data.list[[length(data.list) + 1]] <- temp
@@ -467,8 +467,8 @@ gen_time_dependent_beta <- function(M, ni, beta, beta.args, gen_visits, cens, rh
       networks.cm <- cumsum(networks)
       n.i <- sample(ni[1]:ni[2], 1)
       sub.ni <- networks[networks.cm < n.i]
-      copula.fn.list <- lapply(sub.ni, FUN=function(x) claytonCopula(-2*rho/(rho-1), dim = x))
-      u <- do.call(c, lapply(copula.fn.list, FUN=function(x) as.numeric(rCopula(1, x))))
+      copula.fn.list <- lapply(sub.ni, FUN=function(x) copula::claytonCopula(-2*rho/(rho-1), dim = x))
+      u <- do.call(c, lapply(copula.fn.list, FUN=function(x) as.numeric(copula::rCopula(1, x))))
       temp <- matrix(NA, nrow=length(u), ncol=3)
       temp[, 1] <- i; temp[, 2] <- u; temp[, 3] <- tx.sequence[i]
       data.list[[length(data.list) + 1]] <- temp
