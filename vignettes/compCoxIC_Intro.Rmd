@@ -1,6 +1,6 @@
 ---
 title: "Fitting Marginal Cox Models with Clustered Interval-Censored Data"
-author: ""
+author: "Katrina Wang"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Fitting Marginal Cox Models}
@@ -39,15 +39,14 @@ stratum_assign <- function(s) sample(1:4, s, replace = TRUE)
 
 # Simulate the data
 data <- gen_time_varying_cov(
-  s = 200,
-  group.size.range = c(20, 30),
+  M = 200, 
+  ni = c(20, 30),
   beta = c(-1, 0.5, 0),
-  visits.generator = gen_visits,
-  censoring.rate = 0,
+  gen_visits = gen_visits_bcpp,
+  cens = 0,
   rho = 0.5,
   baseline = baseline,
-  S = stratum_assign
-)
+  S = stratum_assign)
 
 head(data)
 ```

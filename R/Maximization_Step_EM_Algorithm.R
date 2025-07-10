@@ -21,7 +21,7 @@ update_beta <- function(beta, u.star, tau, x, w, risk, weights=NULL){
   }
 
   # Finding and returning zeroes of the profile composite score equation for beta
-  suppressWarnings(multiroot(beta_score, start=beta, u.star=u.star, tau=tau, x=x, w=w, risk=risk, weights=weights, maxiter=1)$root, classes="warning")
+  suppressWarnings(rootSolve::multiroot(beta_score, start=beta, u.star=u.star, tau=tau, x=x, w=w, risk=risk, weights=weights, maxiter=1)$root, classes="warning")
 
 }
 

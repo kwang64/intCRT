@@ -118,7 +118,7 @@ plot.compCoxIC <- function(x, type=c("cumulative hazard", "survival", "cumulativ
         data.frame(tau.ir=x$baseline.hazard[[z]][,1], ch=cumsum(x$baseline.hazard[[z]][,2]), stratum=names(x$baseline.hazard)[z])
 
       }))
-      p <- ggplot(temp, aes(x=tau.ir, y=ch, group=stratum)) + geom_line(aes(color=stratum))
+      p <- ggplot2::ggplot(temp, aes(x=tau.ir, y=ch, group=stratum)) + geom_line(aes(color=stratum))
       p <- p + xlab(x.title) + ylab(y.title.2) + guides(color=guide_legend(title=legend.title))
       print(p)
     }
@@ -132,7 +132,7 @@ plot.compCoxIC <- function(x, type=c("cumulative hazard", "survival", "cumulativ
         data.frame(tau.ir=x$baseline.hazard[[z]][,1], surv=exp(-cumsum(x$baseline.hazard[[z]][,2])), stratum=names(x$baseline.hazard)[z])
 
       }))
-      p <- ggplot(temp, aes(x=tau.ir, y=surv, group=stratum)) + geom_line(aes(color=stratum))
+      p <- ggplot2::ggplot(temp, aes(x=tau.ir, y=surv, group=stratum)) + geom_line(aes(color=stratum))
       p <- p + xlab(x.title) + ylab(y.title.2) + guides(color=guide_legend(title=legend.title))
       print(p)
     }
@@ -146,7 +146,7 @@ plot.compCoxIC <- function(x, type=c("cumulative hazard", "survival", "cumulativ
         data.frame(tau.ir=x$baseline.hazard[[z]][,1], surv=1-exp(-cumsum(x$baseline.hazard[[z]][,2])), stratum=names(x$baseline.hazard)[z])
 
       }))
-      p <- ggplot(temp, aes(x=tau.ir, y=surv, group=stratum)) + geom_line(aes(color=stratum))
+      p <- ggplot2::ggplot(temp, aes(x=tau.ir, y=surv, group=stratum)) + geom_line(aes(color=stratum))
       p <- p + xlab(x.title) + ylab(y.title.2) + guides(color=guide_legend(title=legend.title))
       print(p)
     }
@@ -161,7 +161,7 @@ plot.compCoxIC <- function(x, type=c("cumulative hazard", "survival", "cumulativ
       for (i in 1:length(x$baseline.hazard)){
         stratum.name <- names(x$baseline.hazard)[i]
         temp <- data.frame(tau.ir=x$baseline.hazard[[i]][,1], ch=cumsum(x$baseline.hazard[[i]][,2]))
-        p <- ggplot(temp, aes(x=tau.ir, y=ch)) + geom_line(color=colors[i])
+        p <- ggplot2::ggplot(temp, aes(x=tau.ir, y=ch)) + geom_line(color=colors[i])
         p <- p + xlab(x.title) + ylab(y.title.2) + title(paste0(legend.title," ", stratum.name))
         print(p)
       }
@@ -176,7 +176,7 @@ plot.compCoxIC <- function(x, type=c("cumulative hazard", "survival", "cumulativ
       for (i in 1:length(x$baseline.hazard)){
         stratum.name <- names(x$baseline.hazard)[i]
         temp <- data.frame(tau.ir=x$baseline.hazard[[i]][,1], surv=exp(-cumsum(x$baseline.hazard[[i]][,2])))
-        p <- ggplot(temp, aes(x=tau.ir, y=surv)) + geom_line(color=colors[i])
+        p <- ggplot2::ggplot(temp, aes(x=tau.ir, y=surv)) + geom_line(color=colors[i])
         p <- p + xlab(x.title) + ylab(y.title.2) + ggtitle(paste0(legend.title," ", stratum.name))
         print(p)
       }
@@ -191,7 +191,7 @@ plot.compCoxIC <- function(x, type=c("cumulative hazard", "survival", "cumulativ
       for (i in 1:length(x$baseline.hazard)){
         stratum.name <- names(x$baseline.hazard)[i]
         temp <- data.frame(tau.ir=x$baseline.hazard[[i]][,1], surv=1-exp(-cumsum(x$baseline.hazard[[i]][,2])))
-        p <- ggplot(temp, aes(x=tau.ir, y=surv)) + geom_line(color=colors[i])
+        p <-  ggplot2::ggplot(temp, aes(x=tau.ir, y=surv)) + geom_line(color=colors[i])
         p <- p + xlab(x.title) + ylab(y.title.2) + ggtitle(paste0(legend.title," ", stratum.name))
         print(p)
       }
