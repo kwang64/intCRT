@@ -7,7 +7,7 @@
 ## Overview
 intCRT R package provides tools for fitting and conducting inference on marginal Cox proportional hazard models for 
 cluster-dependent and interval-censored time-to-event data. It is structured according to the method described in the 
-Cook et al.(2023), including the Botswana Combination Prevention Project as an applied example.
+[Cook et al.](https://pubmed.ncbi.nlm.nih.gov/36314377/) (2023), including the Botswana Combination Prevention Project as an applied example.
 
 The package includes two sets of functions:
 
@@ -33,7 +33,7 @@ devtools::install_github("yourusername/BCPP")
 
 - [`devtools`](https://cran.r-project.org/package=devtools)
 
-- `[rootSolve`](https://cran.r-project.org/package=rootSolve)
+- [`rootSolve`](https://cran.r-project.org/package=rootSolve)
 
 - [`abind`](https://cran.r-project.org/package=abind)
 
@@ -49,6 +49,13 @@ devtools::install_github("yourusername/BCPP")
 
 These will be automatically imported when loading the package
 
+## Core Functionalities
+
+# Model Estimation
+
+# Data Pre-Processing and Estimation Internals
+
+# Data Simulation Tools
 
 ## Example
 
