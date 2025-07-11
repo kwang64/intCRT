@@ -29,6 +29,27 @@ install.packages("devtools")
 devtools::install_github("yourusername/BCPP")
 ```
 
+## Dependencies
+
+- [`devtools`](https://cran.r-project.org/package=devtools)
+
+- `[rootSolve`](https://cran.r-project.org/package=rootSolve)
+
+- [`abind`](https://cran.r-project.org/package=abind)
+
+- [`ggplot2`](https://cran.r-project.org/package=ggplot2)
+
+- [`rmarkdown`](https://cran.r-project.org/package=rmarkdown)
+
+- [`knitr`](https://cran.r-project.org/package=knitr)
+
+- [`copula`](https://cran.r-project.org/package=copula)
+
+- [`stabledist`](https://cran.r-project.org/package=stabledist)
+
+These will be automatically imported when loading the package
+
+
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
