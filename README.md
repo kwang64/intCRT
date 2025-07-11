@@ -1,5 +1,5 @@
 
-# BCPP.Package
+# intCRT Package
 
 <!-- badges: start -->
 <!-- badges: end -->
