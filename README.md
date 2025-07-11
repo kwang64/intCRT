@@ -51,11 +51,11 @@ These will be automatically imported when loading the package
 
 ## Core Functionalities
 
-# Model Estimation
+### Model Estimation
 
-# Data Pre-Processing and Estimation Internals
+### Data Pre-Processing and Estimation Internals
 
-# Data Simulation Tools
+### Data Simulation Tools
 
 ## Example
 
