@@ -25,8 +25,8 @@ You can install the development version of BCPP.Package from [GitHub](https://gi
 # Install devtools if necessary
 install.packages("devtools")
 
-# Install BCPP from GitHub
-devtools::install_github("yourusername/BCPP")
+# Install intCRT from GitHub
+devtools::install_github("yourusername/intCRT")
 ```
 
 ## Dependencies
@@ -54,6 +54,13 @@ These will be automatically imported when loading the package
 ### Model Estimation
 
 ### Data Pre-Processing and Estimation Internals
+These are the main functions for fitting, summarizing, and visualizing the model:
+
+- `composite_coxIC()`:
+
+- `summary.compCoxIC()`:
+
+- `plot.compCoxIC()`: 
 
 ### Data Simulation Tools
 
