@@ -19,7 +19,7 @@ the Botswana Combination Prevention Project
 
 ## Installation
 
-You can install the development version of BCPP.Package from [GitHub](https://github.com/) with:
+You can install the development version of intCRT package from [GitHub](https://github.com/kwang64/intCRT) with:
 
 ``` r
 # Install devtools if necessary
@@ -69,7 +69,7 @@ These are the main functions for fitting, summarizing, and visualizing the model
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-library(BCPP.Package)
+library(intCRT.Package)
 ## basic example code
 ```
 
