@@ -75,14 +75,28 @@ Helper functions used internally by `composite_coxIC()` (users typically do not 
 - `variance_beta()`, `make_basis()`, `argmax_profile()`, `H()`, `J()`, `J_i_1()`, `J_i_2()`
 
 ### Data Simulation Tools
+The following functions allow users to simulate clustered, interval-censored datasets resembling the Botswana Combination prevention Project:
+
+- `gen_time_varying_cov()`, `gen_time_varying_cov_tx()`: Generate datasets with time-dependent covariates.
+
+- `gen_time_dependent_beta()`, `gen_time_dependent_beta_tx()`: Generate datasets with time-varying treatment effects.
+
+- `return_baseline()`, `return_exp_baseline()`: Generate baseline survival and hazard functions.
+
+- `gen_visits_bcpp()`, `gen_visits_freq()`, `gen_visits_tx()`: Generate simulated clinic visit schdules.
+
+## Botswana Combination Prevention Project (BCPP) 
+intCRT package includes an analysis-ready dataset of HIV-negative individuals from the Botswana Combination Prevention Project (BCPP),
+structured for survival analysis with clustered interval-censored data.
+The data were sourced from the [publicly released data](https://data.cdc.gov/Global-Health/Botswana-Combination-Prevention-Project-BCPP-Publi/qcw5-4m9q/about_data) conducted by conducted by 
+the Botswana Ministry of Health (MOH), Harvard School of Public Health/Botswana Harvard AIDS Institute Partnership (BHP), and the U.S. Centers for Disease Control and Prevention (CDC). 
 
 
-## Example
 
-This is a basic example which shows you how to solve a common problem:
+## Vignette
+A detailed vignette demonstrating model fitting, data simulation, and interpretation of results is avaliable. Run this in R:
 
 ``` r
-library(intCRT.Package)
-## basic example code
+browseVignettes("intCRT")
 ```
 
