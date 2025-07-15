@@ -1,5 +1,5 @@
 Package: intCRT
-Title:  Interval Censored Cluster Randomized Trail
+Title: Interval Censored Cluster Randomized Trail
 Version: 0.0.0.9000
 Authors@R: 
     person("Katrina", "Wang","kwang64@smith.edu", role = c("aut", "cre"),
@@ -18,3 +18,6 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)
+LazyData: true
