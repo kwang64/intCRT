@@ -88,13 +88,15 @@ The following functions allow users to simulate clustered, interval-censored dat
 ## Botswana Combination Prevention Project (BCPP) 
 intCRT package includes an analysis-ready dataset of HIV-negative individuals from the Botswana Combination Prevention Project (BCPP),
 structured for survival analysis with clustered interval-censored data.
+
 The data were sourced from the [publicly released data](https://data.cdc.gov/Global-Health/Botswana-Combination-Prevention-Project-BCPP-Publi/qcw5-4m9q/about_data) conducted by conducted by 
 the Botswana Ministry of Health (MOH), Harvard School of Public Health/Botswana Harvard AIDS Institute Partnership (BHP), and the U.S. Centers for Disease Control and Prevention (CDC). 
 
 
-
 ## Vignette
-A detailed vignette demonstrating model fitting, data simulation, and interpretation of results is avaliable. Run this in R:
+A detailed vignette demonstrating model fitting, data simulation, and interpretation of results is available. 
+
+Run this in R:
 
 ``` r
 browseVignettes("intCRT")
