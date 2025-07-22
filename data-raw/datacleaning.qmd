@@ -34,13 +34,13 @@ yr3_incident <- subset(yr3,de_subj_idC%in%id_valid & hiv_status_current != "Refu
 keep_cols <- c("de_subj_idC", "community_rndmN","pair_rndmN","interview_days",
                "survey","hiv_status_current","prev_hivresult","prev_hivresult_days",
                "random_arm","gender","age_at_interview","marital_status","education","alcohol_lastsex") 
-#no prev_hivresult_date only prev_hivresult_days. are these the same?
 
 yr1_sub <- yr1_incident[, keep_cols, drop = FALSE]
 yr2_sub <- yr2_incident[, keep_cols, drop = FALSE] # easier ways to write this?
 
 bhs_df <- rbind(subset(yr1_sub,survey == "BHS" & de_subj_idC %in% id_valid),
                 subset(yr2_sub, survey == "BHS" & de_subj_idC %in% id_valid))
+# merge?
 
 # df for AHS-1
 cols_AHS1 <- c("de_subj_idC","community_rndmN","pair_rndmN",
@@ -69,11 +69,15 @@ names(AHS2_df)[names(AHS2_df) %in% c("interview_days", "hiv_status_current","pre
 merged_df <- bhs_df |>
   left_join(AHS1_df, by = "de_subj_idC") |>
   left_join(AHS2_df, by = "de_subj_idC")
+
+# merge()?
 ```
 
 ```{r}
 # find the interval
-calculate_intervals <- lapply(seq_len(nrow(merged_df))),function(df_row){
+
+
+calculate_intervals <- function(df_row){
     times <- c(df_row$interview_days, df_row$fu1_interview_days, df_row$fu2_interview_days)
     status <- c(df_row$hiv_status_current, df_row$fu1_hiv_status_current, df_row$fu2_hiv_status_current)
 
@@ -94,6 +98,9 @@ calculate_intervals <- lapply(seq_len(nrow(merged_df))),function(df_row){
 intervals <- t(apply(merged_df, 1, calculate_intervals))
 merged_df$left <- intervals[, 1]
 merged_df$right <- intervals[, 2]
+
+#debug
+
 ```
 
 

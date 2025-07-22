@@ -1,5 +1,14 @@
 
-# intCRT Package
+```{r}
+#| echo: false
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/README-"
+)
+```
+
+# intCRT <img src="man/intCRT_sticker.png" align="right" height="138"  /></a>
 
 <!-- badges: start -->
 <!-- badges: end -->

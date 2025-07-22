@@ -21,13 +21,35 @@ library(intCRT)
 ```
 
 ## Overview
+This vignette demonstrates how to use the functions in intCRT to estimate marginal Cox proportional hazards models for clustered interval-censored data, with the option to incorporate time-dependent covariates, parametric time-varying covariate effects, and stratification of the baseline hazard functions. The methodology is based on the composite likelihood framework developed in [Cook et al.](https://pubmed.ncbi.nlm.nih.gov/36314377/) (2023)
 
-This vignette demonstrates how to use the functions in this package to estimate marginal Cox proportional hazards models for clustered interval-censored data, incorporating time-dependent covariates and stratification. The methodology is based on the composite likelihood framework developed in [Cook et al.](https://pubmed.ncbi.nlm.nih.gov/36314377/) (2023)
+This vignette also shows how to use the package’s data generation utilities in order to create simulated datasets that mimics the Botswana Combination Prevention Project (BCPP) structure, using included data generation utilities. +reference
 
-This package also show how to generate simulated data that mimics the Bostwana Combination Prevention Project (BCPP) structure, using included data generation utilities.
+## Clustered Interval-Censored Data
+In survival analysis, interval censoring occurs when the exact time of an event (such as infection or failure) is not observed, but is known to lie within an interval between two observed times. This type of data usually arises in studies where observations are monitored at discrete time points (such as scheduled inspections). In biomedical and epidemiological studies, interval censored data are sometimes associated with clusters when the observations belongs to different groups. When interval censoring occurs alongside within-cluster dependence, the data are referred to as clustered interval-censored data.
+
+## Population Model for the Marginal Cox Model
+The model of the hazard function for the time-to-event given time-dependent covariate `X(t)` and stratification variable `Z` is:
+
+\[
+\lambda(t \mid X(t), Z) = \lambda_0(t; Z) \exp\{\beta^T X(t)\}
+\]
+
+Where:
+- \(\lambda_0(t; Z)\) is a stratum-specific baseline hazard function.
+- \(\beta\) is a $p$-dimensional vector of covariate effect.
+- \(X(t)\) is a $p$-dimensional bounded covariate process informing the time-to-event distribution.
+- \(Z\) is a stratification variable indicating cluster or stratum.
+
+## intCRT Data: Simulation & BCPP Dataset
+intCRT package offers two main ways to work with data:
+
+- Simulating data that incorporates time-dependent covariates.
+
+- Exploring an analysis-ready dataset of HIV-negative individuals from the Botswana Combination Prevention Project (BCPP), formatted for survival analysis with clustered interval-censored data.
 
 ## Simulating Data with Time-Dependent Covariates
-We begin by simulating data from a clustered interval-censored survival model with time-varying covariates.
+We begin by simulating data from a clustered interval-censored survival model with time-varying covariates. 
 
 ```{r}
 set.seed(112358)
@@ -37,9 +59,11 @@ baseline <- lapply(1:4, function(i) return_baseline(maxT = 320, knots = 8))
 
 # Define stratification function
 stratum_assign <- function(s) sample(1:4, s, replace = TRUE)
+```
 
+```{r}
 # Simulate the data
-data <- gen_time_varying_cov(
+data <- gen_time_dependent_cov(
   M = 200, 
   ni = c(20, 30),
   beta = c(-1, 0.5, 0),
@@ -51,9 +75,29 @@ data <- gen_time_varying_cov(
 
 head(data)
 ```
+++ model of `gen_time_dependent_cov()`
+
+In the example above, we simulate a clustered interval-censored dataset using `gen_time_dependent_cov()`. The simulation setup includes:
+
+- 200 clusters (M = 200), representing distinct communities.
+
+- Cluster sizes ranging from 20 to 30 individuals.
+
+- No additional random censoring (cens = 0).
+
+- A within-cluster dependence parameter (ρ = 0.5), reflecting moderate correlation between individuals within the same cluster.
+
+-  A stratification variable with four levels
+
+- Baseline hazard functions specified through baseline, which define the stratum-specific survival distributions.
+
+The simulated dataset includes left and right endpoints for interval-censored event times as well as relevant covariate and clustering information.
+
 
 ## Fitting the Model (without variance estimation)
 
+The function used to fit the model is `composite_coxIC()`. This function obtains composite maximum likelihood estimators based on the marginal Cox regression model [see above]. 
+#` need a citation
 ```{r}
 tdc_model_fit <- composite_coxIC(
   formula = Surv(left, right, type = "interval2") ~ treat + utt,
@@ -63,9 +107,32 @@ tdc_model_fit <- composite_coxIC(
   id = "id",
   variance = FALSE
 )
+```
 
+In this example:
+
+- `formula` specifies the marginal Cox model using Surv(left, right, type = "interval2") to indicate interval-censored data.
+
+- `data` is the simulated dataset generated previously.
+
+- `strata` specifies the stratification variable, aligning with stratum-specific baseline hazards.
+
+- `clus` indicates the clustering variable, accounting for within-cluster dependence.
+
+- `id` specifies the subject identifier, used for handling time-varying covariates.
+
+- `variance` = FALSE disables variance estimation to reduce computation time.
+
+
+
+```{r}
 summary(tdc_model_fit)
 ```
+
+
+```{r}
+```
+
 
 ## Visualizing the Baseline Functions
 ```{r}

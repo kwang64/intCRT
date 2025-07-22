@@ -2,10 +2,8 @@ Package: intCRT
 Title: Interval Censored Cluster Randomized Trail
 Version: 0.0.0.9000
 Authors@R: 
-    person("Katrina", "Wang","kwang64@smith.edu", role = c("aut", "cre"),
-           comment ="helped build the package"),
-    person("Kaitlyn", "Cook", "kcook93@smith,edu", role = c("aut", "cre","cph"))
-Description: This package provides functions for fitting and conducting inference on marginal Cox proportional hazard models for cluster-dependent and interval-censored time-to-event data.
+    person(given = "Katrina", family = "Wang", email = "kwang64@smith.edu", role = c("aut", "cre"))
+libDescription: This package provides functions for fitting and conducting inference on marginal Cox proportional hazard models for cluster-dependent and interval-censored time-to-event data.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

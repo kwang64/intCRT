@@ -331,7 +331,7 @@ gen_time_varying_cov_tx <- function(M, ni, beta, gen_visits, cens, rho=0, baseli
 #' set.seed(123)
 #' baseline <- list(return_exp_baseline(10, lambda0 = 0.2, alpha = 0))
 #' gen_visits <- function(n) t(replicate(n, sort(runif(4, 0, 10))))
-#' simdat <- gen_time_varying_cov(M = 4, ni = c(5, 6),
+#' simdat <- gen_time_dependent_cov(M = 4, ni = c(5, 6),
 #'                                 beta = c(0.1, -0.2, 0.05),
 #'                                 gen_visits = gen_visits,
 #'                                 cens = 0.01,
@@ -341,7 +341,7 @@ gen_time_varying_cov_tx <- function(M, ni, beta, gen_visits, cens, rho=0, baseli
 #'
 #' @export
 
-gen_time_varying_cov <- function(M, ni, beta, gen_visits, cens, rho=0, baseline, S){
+gen_time_dependent_cov <- function(M, ni, beta, gen_visits, cens, rho=0, baseline, S){
 
   # Generating the design matrix if observations are independent within each cluster
   if (rho==0){
@@ -408,5 +408,6 @@ gen_time_varying_cov <- function(M, ni, beta, gen_visits, cens, rho=0, baseline,
   }))
 
   # Returning the final dataset
+  rownames(out) <- NULL
   return(out)
 }
