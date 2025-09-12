@@ -1,5 +1,5 @@
 ---
-title: "Fitting Marginal Cox Models with Clustered Interval-Censored Data"
+title: 
 author: "Katrina Wang"
 output: rmarkdown::html_vignette
 vignette: >
@@ -31,15 +31,14 @@ In survival analysis, interval censoring occurs when the exact time of an event 
 ## Population Model for the Marginal Cox Model
 The model of the hazard function for the time-to-event given time-dependent covariate `X(t)` and stratification variable `Z` is:
 
-\[
-\lambda(t \mid X(t), Z) = \lambda_0(t; Z) \exp\{\beta^T X(t)\}
-\]
-
+$$
+\lambda(t \mid X(t), Z) = \lambda_0(t; Z) \exp\left\{ \beta^T X(t) \right\}
+$$
 Where:
-- \(\lambda_0(t; Z)\) is a stratum-specific baseline hazard function.
-- \(\beta\) is a $p$-dimensional vector of covariate effect.
-- \(X(t)\) is a $p$-dimensional bounded covariate process informing the time-to-event distribution.
-- \(Z\) is a stratification variable indicating cluster or stratum.
+- $\lambda_0(t; Z)$ is a stratum-specific baseline hazard function.
+- $\beta$ is a $p$-dimensional vector of covariate effect.
+- $X(t)$ is a $p$-dimensional bounded covariate process informing the time-to-event distribution.
+- $Z$ is a stratification variable indicating cluster or stratum.
 
 ## intCRT Data: Simulation & BCPP Dataset
 intCRT package offers two main ways to work with data:
@@ -75,23 +74,27 @@ data <- gen_time_dependent_cov(
 
 head(data)
 ```
-++ model of `gen_time_dependent_cov()`
 
-In the example above, we simulate a clustered interval-censored dataset using `gen_time_dependent_cov()`. The simulation setup includes:
+The `gen_time_dependent_cov()` function uses the following model that allows for time-dependent covariates:
+$$
+\lambda(t \mid X(t), Z) = \lambda_Z(t) \exp\left\{ \beta_1 X + \beta_2 P(t) + \beta_3 X P(t) \right\}
+$$
 
-- 200 clusters (M = 200), representing distinct communities.
+THe model is used for simulating a clustered interval-censored dataset where:
 
-- Cluster sizes ranging from 20 to 30 individuals.
+- $Z$ is the value of stratification vector
 
-- No additional random censoring (cens = 0).
+- $X$ is the time-constant binary variable, representing treatment assignment
 
-- A within-cluster dependence parameter (ρ = 0.5), reflecting moderate correlation between individuals within the same cluster.
+- $P(t)$ is the value of a time-dependent binary variable representing an indicator of whether or not the Botswana policy of Universal Test and Treat was in effect at study time $t$
 
--  A stratification variable with four levels
+For the example we used here, we have a total 200 clusters (`M = 200`), representing 200 distinct communities, and the cluster sizes are ranged from 20 to 30 individuals (`ni = c(20, 30)`). Note that in the example code, `beta = c(-1, 0.5, 0)`, $\beta$ has three value, representing the coefficients of $X, P(t)$ and $X*P(t)$.
 
-- Baseline hazard functions specified through baseline, which define the stratum-specific survival distributions.
+- $\beta_1 = -1$ is the coefficient of the main effect (treatment assignment) indicator. -1 refers to  
 
-The simulated dataset includes left and right endpoints for interval-censored event times as well as relevant covariate and clustering information.
+- $\beta_2 = 0.5$ is the coefficient of the effect of the BCPP.
+
+- $\beta_3 = 0$ refers to the interaction coefficient of the interaction of the treatment assignment and the BCPP schedule 0 refers to there is no effect for the interaction.
 
 
 ## Fitting the Model (without variance estimation)
