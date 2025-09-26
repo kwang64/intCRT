@@ -1,0 +1,67 @@
+```{r}
+library(dplyr)
+
+obs_df <- tribble(
+  ~ID, ~hiv_status_current, ~fu1_hiv_status_current, ~fu1_interview_days, ~fu1_prev_hivresult, ~fu1_prev_hivresult_days,
+       ~fu2_hiv_status_current, ~fu2_interview_days, ~fu2_prev_hivresult, ~fu2_prev_hivresult_days,
+   1, "HIV-uninfected", "HIV-uninfected", 372, "NEG", 0, "HIV-uninfected", 897, "NEG", 517,
+   2, "HIV-uninfected", "HIV-uninfected", 367, "NEG", -440, "HIV-infected", 919, "NEG", 367,
+   3, "HIV-uninfected", "HIV-infected", 385, "NEG", 120, NA, NA, NA, NA,
+   4, "HIV-uninfected", "HIV-infected", 377, "NEG", 0, "HIV-infected", 902, "NEG", 0,
+   5, "HIV-uninfected", "Refused HIV testing", 897, "NEG", NA, NA, NA, NA, NA,
+   6, "HIV-uninfected", "HIV-uninfected", 374, "NEG", 0, "Refused HIV testing", 897, "NEG", 871
+)
+
+```
+
+
+Calculate left/right
+
+left = last time with confirmed negative (HIV-uninfected or NEG)
+
+right = first time with HIV-infected
+
+if never infected → right = Inf
+```{r}
+library(dplyr)
+library(purrr)
+library(tibble)
+
+# Function to compute interval
+calculate_interval <- function(hiv_status_current, fu1_hiv_status_current, fu2_hiv_status_current,
+                               fu1_interview_days, fu1_prev_hivresult, fu1_prev_hivresult_days,
+                               fu2_interview_days, fu2_prev_hivresult, fu2_prev_hivresult_days) {
+  times <- c(0, fu1_interview_days, fu1_prev_hivresult_days, fu2_interview_days, fu2_prev_hivresult_days)
+  status <- c(hiv_status_current, fu1_hiv_status_current, fu1_prev_hivresult, fu2_hiv_status_current, fu2_prev_hivresult)
+
+  df <- tibble(time = times, result = status) |>
+    filter(!is.na(time), !is.na(result)) |>
+    filter(result != "Refused HIV testing") |>
+    filter(time >= 0)
+
+  # latest negative
+  neg_times <- df |> 
+    filter(result %in% c("HIV-uninfected", "NEG")) |> 
+    pull(time)
+  left <- if (length(neg_times) > 0) max(neg_times) else NA
+
+  # earliest positive
+  pos_times <- df |> 
+    filter(result %in% c("HIV-infected", "POS")) |> pull(time)
+  right <- if (length(pos_times) > 0) min(pos_times) else Inf
+
+  tibble(left = left, right = right)
+}
+
+# Apply function across rows (exclude ID, then add back)
+intervals <- obs_df |> 
+  select(-ID) |> 
+  pmap_dfr(calculate_interval)
+
+final_df <- obs_df["ID"] |> 
+  bind_cols(intervals)
+print(final_df)
+
+
+```
+
