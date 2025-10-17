@@ -1,105 +1,110 @@
-```{r}
+```{r, warning=FALSE}
 library(readr)
 library(dplyr)
-yr1 <- read_csv("/Users/katrinawang/Documents/intCRT/data-raw/LONGYR1_20SAMP_OPEN.csv")
-yr2 <- read_csv("/Users/katrinawang/Documents/intCRT/data-raw/LONGYR2_20SAMP_OPEN.csv")
-yr3 <- read_csv("/Users/katrinawang/Documents/intCRT/data-raw/LONGYR3_20SAMP_OPEN.csv")
+yr1 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR1_20SAMP_OPEN.csv")
+yr2 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR2_20SAMP_OPEN.csv")
+yr3 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR3_20SAMP_OPEN.csv")
 ```
 
-
-```{r}
 # Step 1: select who were HIV-neg start + followed over time for HIV infection
-# subset yr1 incidents
-yr1_incident <- subset(yr1, hiv_status_current == "HIV-uninfected" & incidence_cohort == "Yes"& hiv_status_current != "Refused HIV testing")
+```{r}
+# YR1: baseline participants, HIV-negative, incidence cohort
+yr1_incident <- yr1 |>
+  filter(hiv_status_current == "HIV-uninfected",
+         incidence_cohort == "Yes",
+         hiv_status_current != "Refused HIV testing")
+
 id_incident <- yr1_incident$de_subj_idC
 
-# subset yr2 (yr2 newly entered participant who are uninfected when they take Baseline survey)
-yr2_baseline <- subset(yr2, survey == "BHS" & hiv_status_current == "HIV-uninfected")
+# YR2: late entrants, baseline survey & HIV-negative
+yr2_baseline <- yr2 |>
+  filter(survey == "BHS", hiv_status_current == "HIV-uninfected")
+
 id_late <- yr2_baseline$de_subj_idC
 
-# subset yr2 and yr3 to match the id
-# yr2_incident and yr3_incident: incidents satisfied the baseline requirement
-# ? no incidence_cohort in yr2
+# Combine eligible IDs
+id_valid <- unique(c(id_incident, id_late))
 
-id_valid <- unique(c(id_incident,id_late))
-yr2_incident <- subset(yr2,de_subj_idC%in%id_valid & hiv_status_current != "Refused HIV testing")
-yr3_incident <- subset(yr3,de_subj_idC%in%id_valid & hiv_status_current != "Refused HIV testing")
+# Subset YR2 and YR3 to only valid participants, excluding refusals
+yr2_incident <- yr2 |>
+  filter(de_subj_idC %in% id_valid,
+         hiv_status_current != "Refused HIV testing")
+
+yr3_incident <- yr3 |>
+  filter(de_subj_idC %in% id_valid,
+         hiv_status_current != "Refused HIV testing")
 ```
 
-
+# Step 2: create reduced dataframes for BHS, AHS1 and AHS2
 ```{r}
-# Step 2: create dataframes
-# df for BHS
-
 keep_cols <- c("de_subj_idC", "community_rndmN","pair_rndmN","interview_days",
                "survey","hiv_status_current","prev_hivresult","prev_hivresult_days",
                "random_arm","gender","age_at_interview","marital_status","education","alcohol_lastsex") 
 
+# BHS
 yr1_sub <- yr1_incident[, keep_cols, drop = FALSE]
-yr2_sub <- yr2_incident[, keep_cols, drop = FALSE] # easier ways to write this?
+yr2_sub <- yr2_incident[, keep_cols, drop = FALSE]
 
-bhs_df <- rbind(subset(yr1_sub,survey == "BHS" & de_subj_idC %in% id_valid),
-                subset(yr2_sub, survey == "BHS" & de_subj_idC %in% id_valid))
-# merge?
+bhs_df <- bind_rows(
+  yr1_sub |> filter(survey == "BHS", de_subj_idC %in% id_valid),
+  yr2_sub |> filter(survey == "BHS", de_subj_idC %in% id_valid)
+)
+
 
 # df for AHS-1
-cols_AHS1 <- c("de_subj_idC","community_rndmN","pair_rndmN",
-               "interview_days","survey","hiv_status_current","prev_hivresult","prev_hivresult_days")
-yr1_AHS1 <- yr1_incident[,cols_AHS1, drop=FALSE]
+cols_AHS1 <- c("de_subj_idC", "community_rndmN", "pair_rndmN",
+               "interview_days", "survey", "hiv_status_current",
+               "prev_hivresult", "prev_hivresult_days")
+
+yr1_AHS1 <- yr1_incident[, cols_AHS1, drop = FALSE]
 yr2_AHS1 <- yr2_incident[, cols_AHS1, drop = FALSE]
 
-AHS1_df <- rbind(subset(yr1_AHS1,survey == "AHS-1" & de_subj_idC %in% id_valid),
-                subset(yr2_AHS1, survey == "AHS-1" & de_subj_idC %in% id_valid))
-names(AHS1_df)[names(AHS1_df) %in% c("interview_days", "hiv_status_current","prev_hivresult","prev_hivresult_days")] <- c("fu1_interview_days", "fu1_hiv_status_current",
-                                                                                                                          "ful_prev_hivresult", "prev_hivresult_days")
+AHS1_df <- bind_rows(
+  yr1_AHS1 |> filter(survey == "AHS-1", de_subj_idC %in% id_valid),
+  yr2_AHS1 |> filter(survey == "AHS-1", de_subj_idC %in% id_valid)
+)
+
+names(AHS1_df)[names(AHS1_df) %in%
+  c("interview_days", "hiv_status_current", "prev_hivresult", "prev_hivresult_days")] <-
+  c("fu1_interview_days", "fu1_hiv_status_current", "fu1_prev_hivresult", "fu1_prev_hivresult_days")
+
 
 # df for AHS-2
-cols_AHS2 <- c("de_subj_idC","community_rndmN","pair_rndmN",
-               "interview_days","survey","hiv_status_current","prev_hivresult","prev_hivresult_days")
-AHS2_df <- subset(yr3_incident[, cols_AHS2, drop = FALSE], 
-                  survey == "AHS-2" & de_subj_idC %in% id_valid)
+cols_AHS2 <- c("de_subj_idC", "community_rndmN", "pair_rndmN",
+               "interview_days", "survey", "hiv_status_current",
+               "prev_hivresult", "prev_hivresult_days")
 
-names(AHS2_df)[names(AHS2_df) %in% c("interview_days", "hiv_status_current","prev_hivresult","prev_hivresult_days")] <- c("fu2_interview_days", "fu2_hiv_status_current",
-                                                                                                                          "fu2_prev_hivresult", "fu2_prev_hivresult_days")
+AHS2_df <- yr3_incident[, cols_AHS2, drop = FALSE] |>
+  filter(survey == "AHS-2", de_subj_idC %in% id_valid)
+
+names(AHS2_df)[names(AHS2_df) %in%
+  c("interview_days", "hiv_status_current", "prev_hivresult", "prev_hivresult_days")] <-
+  c("fu2_interview_days", "fu2_hiv_status_current", "fu2_prev_hivresult", "fu2_prev_hivresult_days")
 
 ```
 
+# Step 3: Merge the dataset
 ```{r}
-# merge the BHS, AHS1 and AHS2
+# Merge BHS, AHS-1, and AHS-2 by de_subj_idC
 merged_df <- bhs_df |>
-  left_join(AHS1_df, by = "de_subj_idC") |>
-  left_join(AHS2_df, by = "de_subj_idC")
-
-# merge()?
+  full_join(AHS1_df, by = "de_subj_idC", suffix = c("_bhs", "_fu1")) |>
+  full_join(AHS2_df, by = "de_subj_idC", suffix = c("", "_fu2")) |>
+  select(
+    de_subj_idC,
+    hiv_status_current,
+    fu1_hiv_status_current,
+    fu1_interview_days,
+    fu1_prev_hivresult,
+    fu1_prev_hivresult_days,
+    fu2_hiv_status_current,
+    fu2_interview_days,
+    fu2_prev_hivresult,
+    fu2_prev_hivresult_days
+  )
 ```
 
+# Step 4: Applying the function
 ```{r}
-# find the interval
-
-
-calculate_intervals <- function(df_row){
-    times <- c(df_row$interview_days, df_row$fu1_interview_days, df_row$fu2_interview_days)
-    status <- c(df_row$hiv_status_current, df_row$fu1_hiv_status_current, df_row$fu2_hiv_status_current)
-
-    valid_times <- times[!is.na(times)]
-    valid_status <- status[!is.na(times)]
-    
-    # Find left and right endpoints
-  left <- max(valid_times[valid_status == "HIV-uninfected"], na.rm = TRUE)
-  if ("HIV-infected" %in% valid_status) {
-    right <- min(valid_times[valid_status == "HIV-infected"], na.rm = TRUE)
-  } else {
-    right <- Inf
-  }
-
-  return(c(left = left, right = right))
-}
-
-intervals <- t(apply(merged_df, 1, calculate_intervals))
-merged_df$left <- intervals[, 1]
-merged_df$right <- intervals[, 2]
-
-#debug
 
 ```
 
