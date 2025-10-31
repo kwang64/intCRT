@@ -1,6 +1,8 @@
 ```{r, warning=FALSE}
 library(readr)
 library(dplyr)
+library(purrr)
+library(tibble)
 yr1 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR1_20SAMP_OPEN.csv")
 yr2 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR2_20SAMP_OPEN.csv")
 yr3 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR3_20SAMP_OPEN.csv")
@@ -11,8 +13,7 @@ yr3 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR3_20SAMP_OPEN.csv")
 # YR1: baseline participants, HIV-negative, incidence cohort
 yr1_incident <- yr1 |>
   filter(hiv_status_current == "HIV-uninfected",
-         incidence_cohort == "Yes",
-         hiv_status_current != "Refused HIV testing")
+         incidence_cohort == "Yes")
 
 id_incident <- yr1_incident$de_subj_idC
 
@@ -85,26 +86,70 @@ names(AHS2_df)[names(AHS2_df) %in%
 
 # Step 3: Merge the dataset
 ```{r}
-# Merge BHS, AHS-1, and AHS-2 by de_subj_idC
-merged_df <- bhs_df |>
-  full_join(AHS1_df, by = "de_subj_idC", suffix = c("_bhs", "_fu1")) |>
-  full_join(AHS2_df, by = "de_subj_idC", suffix = c("", "_fu2")) |>
-  select(
-    de_subj_idC,
-    hiv_status_current,
-    fu1_hiv_status_current,
-    fu1_interview_days,
-    fu1_prev_hivresult,
-    fu1_prev_hivresult_days,
-    fu2_hiv_status_current,
-    fu2_interview_days,
-    fu2_prev_hivresult,
-    fu2_prev_hivresult_days
-  )
+merged_df <- merge(bhs_df, AHS1_df, by = "de_subj_idC", all.x = TRUE)
+merged_df <- merge(merged_df, AHS2_df, by = "de_subj_idC", all.x = TRUE)
+
+# Keep only relevant columns
+merged_df <- merged_df[, c("de_subj_idC",
+                           "hiv_status_current",
+                           "fu1_hiv_status_current",
+                           "fu1_interview_days",
+                           "fu1_prev_hivresult",
+                           "fu1_prev_hivresult_days",
+                           "fu2_hiv_status_current",
+                           "fu2_interview_days",
+                           "fu2_prev_hivresult",
+                           "fu2_prev_hivresult_days")]
+
+# Flag IDs not in BHS
+extra_ids <- setdiff(unique(c(AHS1_df$de_subj_idC, AHS2_df$de_subj_idC)), bhs_df$de_subj_idC)
+merged_df$flag_not_in_BHS <- merged_df$de_subj_idC %in% extra_ids
+
 ```
 
-# Step 4: Applying the function
+# Step 4: Applying the function created in dummy data
 ```{r}
+#function
+calculate_interval <- function(hiv_status_current, fu1_hiv_status_current, fu2_hiv_status_current,
+                               fu1_interview_days, fu1_prev_hivresult, fu1_prev_hivresult_days,
+                               fu2_interview_days, fu2_prev_hivresult, fu2_prev_hivresult_days) {
+  times <- c(0, fu1_interview_days, fu1_prev_hivresult_days, fu2_interview_days, fu2_prev_hivresult_days)
+  status <- c(hiv_status_current, fu1_hiv_status_current, fu1_prev_hivresult, fu2_hiv_status_current, fu2_prev_hivresult)
+
+  df <- tibble(time = times, result = status) |>
+    filter(!is.na(time), !is.na(result)) |>
+    filter(result != "Refused HIV testing") |>
+    filter(time >= 0)
+
+  # latest negative
+  neg_times <- df |> 
+    filter(result %in% c("HIV-uninfected", "NEG")) |> 
+    pull(time)
+  left <- if (length(neg_times) > 0) max(neg_times) else NA
+
+  # earliest positive
+  pos_times <- df |> 
+    filter(result %in% c("HIV-infected", "POS")) |> pull(time)
+  right <- if (length(pos_times) > 0) min(pos_times) else Inf
+
+  tibble(left = left, right = right)
+}
+
+# Apply function across rows (exclude ID, then add back)
+intervals <- merged_df |>
+  select(hiv_status_current, fu1_hiv_status_current, fu2_hiv_status_current,
+         fu1_interview_days, fu1_prev_hivresult, fu1_prev_hivresult_days,
+         fu2_interview_days, fu2_prev_hivresult, fu2_prev_hivresult_days) |>
+  pmap_dfr(calculate_interval)
+
+final_df <- bind_cols(merged_df, intervals)
+
+# Clean up a little bit..
+final_df <- final_df |>
+  filter(!(left == 0 & right == Inf)) |>
+  filter(left <= right | is.infinite(right)) |>
+  mutate(across(where(is.character), ~na_if(., "")))
+nrow(final_df) 
 
 ```
 
