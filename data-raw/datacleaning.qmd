@@ -6,6 +6,8 @@ library(tibble)
 yr1 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR1_20SAMP_OPEN.csv")
 yr2 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR2_20SAMP_OPEN.csv")
 yr3 <- read_csv("/Users/katrinawang/intCRT/data-raw/LONGYR3_20SAMP_OPEN.csv")
+
+yr3[yr3$de_subj_idC=="33589A", "survey"] <- "AHS-2"
 ```
 
 # Step 1: select who were HIV-neg start + followed over time for HIV infection
@@ -28,12 +30,10 @@ id_valid <- unique(c(id_incident, id_late))
 
 # Subset YR2 and YR3 to only valid participants, excluding refusals
 yr2_incident <- yr2 |>
-  filter(de_subj_idC %in% id_valid,
-         hiv_status_current != "Refused HIV testing")
+  filter(de_subj_idC %in% id_valid)
 
 yr3_incident <- yr3 |>
-  filter(de_subj_idC %in% id_valid,
-         hiv_status_current != "Refused HIV testing")
+  filter(de_subj_idC %in% id_valid)
 ```
 
 # Step 2: create reduced dataframes for BHS, AHS1 and AHS2
@@ -44,12 +44,9 @@ keep_cols <- c("de_subj_idC", "community_rndmN","pair_rndmN","interview_days",
 
 # BHS
 yr1_sub <- yr1_incident[, keep_cols, drop = FALSE]
-yr2_sub <- yr2_incident[, keep_cols, drop = FALSE]
 
 bhs_df <- bind_rows(
-  yr1_sub |> filter(survey == "BHS", de_subj_idC %in% id_valid),
-  yr2_sub |> filter(survey == "BHS", de_subj_idC %in% id_valid)
-)
+  yr1_sub |> filter(survey == "BHS", de_subj_idC %in% id_valid))
 
 
 # df for AHS-1
@@ -57,13 +54,13 @@ cols_AHS1 <- c("de_subj_idC", "community_rndmN", "pair_rndmN",
                "interview_days", "survey", "hiv_status_current",
                "prev_hivresult", "prev_hivresult_days")
 
-yr1_AHS1 <- yr1_incident[, cols_AHS1, drop = FALSE]
 yr2_AHS1 <- yr2_incident[, cols_AHS1, drop = FALSE]
+yr3_AHS1 <- yr3_incident[, cols_AHS1, drop = FALSE]
 
 AHS1_df <- bind_rows(
-  yr1_AHS1 |> filter(survey == "AHS-1", de_subj_idC %in% id_valid),
-  yr2_AHS1 |> filter(survey == "AHS-1", de_subj_idC %in% id_valid)
-)
+  yr2_AHS1 |> filter(survey == "AHS-1", de_subj_idC %in% id_valid),
+  yr3_AHS1 |> filter(survey == "AHS-1", de_subj_idC %in% id_valid)) # there are participants who complete the survey 1, but skipped survey 2 and directly entered survey 3; so for AHS1 dataframe, we would love to include the survey 3 participants as well. 
+
 
 names(AHS1_df)[names(AHS1_df) %in%
   c("interview_days", "hiv_status_current", "prev_hivresult", "prev_hivresult_days")] <-
