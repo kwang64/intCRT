@@ -1,21 +1,38 @@
 Package: intCRT
-Title: Interval Censored Cluster Randomized Trail
-Version: 0.0.0.9000
+Title: Marginal Cox Models for Clustered Interval-Censored Survival Data
+Version: 0.0.1
 Authors@R: 
-    person(given = "Katrina", family = "Wang", email = "kwang64@smith.edu", role = c("aut", "cre"))
-libDescription: This package provides functions for fitting and conducting inference on marginal Cox proportional hazard models for cluster-dependent and interval-censored time-to-event data.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person(
+        given = "Katrina",
+        family = "Wang",
+        email = "kwang64@smith.edu",
+        role = c("aut", "cre")
+    )
+Description: 
+    Provides functions for fitting marginal Cox proportional hazards models 
+    to clustered interval-censored time-to-event data using the composite likelihood 
+    framework introduced in Cook et al. (2023). The package supports estimation 
+    of regression coefficients, stratum-specific baseline hazards, and robust 
+    variance estimation. Utilities for simulating clustered interval-censored 
+    datasets modeled after the Botswana Combination Prevention Project (BCPP) 
+    are also included.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Imports: ggplot2,copula, devtools, rootSolve, abind, rmarkdown, knitr, stabledist
-Suggests: 
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 3.5.0)
+Imports:
+    ggplot2,
+    copula,
+    rootSolve,
+    abind,
+    stabledist
+Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-Config/testthat/edition: 3
 VignetteBuilder: knitr
-Depends: 
-    R (>= 2.10)
-LazyData: true
+Config/testthat/edition: 3
+URL: https://github.com/kwang64/intCRT
+BugReports: https://github.com/kwang64/intCRT/issues

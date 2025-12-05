@@ -4,6 +4,8 @@
 #' with clustered interval-censored data. Supports optional stratification, clustering,
 #' time-varying covariates, and multiple methods for variance estimation.
 #'
+#' @importFrom abind adrop
+
 #' @param formula A formula object specifying the marginal Cox model (e.g., `Surv(start, stop, event) ~ covariates`). Required if \code{data} is unprocessed.
 #' @param data A \code{data.frame} or a pre-processed \code{list} with two elements:
 #'   \describe{

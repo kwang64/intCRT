@@ -1,12 +1,11 @@
 ---
-title: 
+title: "Fitting Marginal Cox Models for Clustered Interval-Censored Data"
 author: "Katrina Wang"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Fitting Marginal Cox Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-depends: [intCRT]
 ---
 
 ```{r, include = FALSE}
@@ -14,19 +13,38 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
 ```
+
 
 ```{r setup}
 library(intCRT)
 ```
 
 ## Overview
-This vignette demonstrates how to use the functions in intCRT to estimate marginal Cox proportional hazards models for clustered interval-censored data, with the option to incorporate time-dependent covariates, parametric time-varying covariate effects, and stratification of the baseline hazard functions. The methodology is based on the composite likelihood framework developed in [Cook et al.](https://pubmed.ncbi.nlm.nih.gov/36314377/) (2023)
+This vignette demonstrates how to use the intCRT package to fit marginal Cox proportional hazards models for clustered interval-censored survival data, with support for:
 
-This vignette also shows how to use the package’s data generation utilities in order to create simulated datasets that mimics the Botswana Combination Prevention Project (BCPP) structure, using included data generation utilities. +reference
+- time-dependent covariates
+
+- parametric time-varying effects
+
+- stratum-specific baseline hazards
+
+- flexible simulation utilities for complex cluster structures
+
+The methods implemented in intCRT follow the composite likelihood framework developed in [Cook et al.](https://pubmed.ncbi.nlm.nih.gov/36314377/) (2023), which provides valid inference for clustered interval-censored data when full likelihood methods are computationally infeasible.
+
+This vignette also illustrates how to generate simulated datasets designed to mimic the structure of the Botswana Combination Prevention Project (BCPP).
 
 ## Clustered Interval-Censored Data
-In survival analysis, interval censoring occurs when the exact time of an event (such as infection or failure) is not observed, but is known to lie within an interval between two observed times. This type of data usually arises in studies where observations are monitored at discrete time points (such as scheduled inspections). In biomedical and epidemiological studies, interval censored data are sometimes associated with clusters when the observations belongs to different groups. When interval censoring occurs alongside within-cluster dependence, the data are referred to as clustered interval-censored data.
+In survival analysis, interval censoring occurs when the event time is not observed exactly but is only known to lie between two observation times (e.g., between clinic visits or household surveys). This arises naturally in:
+- biomedicals studies
+
+- epidemiology surveillance
+
+- community-based cluster randomized trails
+
+When individuals are grouped into clusters, such as communities, households, or clinical sites, and share unobserved correlation, the data are referred to as clustered interval-censored data. 
 
 ## Population Model for the Marginal Cox Model
 The model of the hazard function for the time-to-event given time-dependent covariate `X(t)` and stratification variable `Z` is:
@@ -39,13 +57,16 @@ Where:
 - $\beta$ is a $p$-dimensional vector of covariate effect.
 - $X(t)$ is a $p$-dimensional bounded covariate process informing the time-to-event distribution.
 - $Z$ is a stratification variable indicating cluster or stratum.
+The composite likelihood estimator targets the population-averaged (marginal) effect $\beta$ , while accounting for within-cluster dependence through robust variance estimation.
 
 ## intCRT Data: Simulation & BCPP Dataset
 intCRT package offers two main ways to work with data:
 
-- Simulating data that incorporates time-dependent covariates.
+1. Simulation tools for generating clustered interval-censored datasets with flexible cluster sizes, time-dependent covariates, and stratum-specific baseline hazards.
 
-- Exploring an analysis-ready dataset of HIV-negative individuals from the Botswana Combination Prevention Project (BCPP), formatted for survival analysis with clustered interval-censored data.
+2. Exploring an analysis-ready dataset of HIV-negative individuals from the Botswana Combination Prevention Project (BCPP), formatted for survival analysis with clustered interval-censored data.
+
+Below we demonstrate how to simulate an example dataset.
 
 ## Simulating Data with Time-Dependent Covariates
 We begin by simulating data from a clustered interval-censored survival model with time-varying covariates. 
@@ -60,10 +81,19 @@ baseline <- lapply(1:4, function(i) return_baseline(maxT = 320, knots = 8))
 stratum_assign <- function(s) sample(1:4, s, replace = TRUE)
 ```
 
+Next, we simulate a dataset that includes:
+- a binary time-constant treatment variable X
+
+- a time-dependent policy indicator P(t)
+
+- their interaction
+
+- clustered interval-censored outcomes
+
 ```{r}
 # Simulate the data
 data <- gen_time_dependent_cov(
-  M = 200, 
+  M = 10, 
   ni = c(20, 30),
   beta = c(-1, 0.5, 0),
   gen_visits = gen_visits_bcpp,
@@ -80,31 +110,34 @@ $$
 \lambda(t \mid X(t), Z) = \lambda_Z(t) \exp\left\{ \beta_1 X + \beta_2 P(t) + \beta_3 X P(t) \right\}
 $$
 
-THe model is used for simulating a clustered interval-censored dataset where:
+The model is used for simulating a clustered interval-censored dataset where:
 
 - $Z$ is the value of stratification vector
 
 - $X$ is the time-constant binary variable, representing treatment assignment
 
-- $P(t)$ is the value of a time-dependent binary variable representing an indicator of whether or not the Botswana policy of Universal Test and Treat was in effect at study time $t$
+- $P(t)$ is the value of a time-dependent binary variable representing an indicator of whether or not the Botswana policy of Universal Test and Treat (UTT) was in effect at study time $t$
 
-For the example we used here, we have a total 200 clusters (`M = 200`), representing 200 distinct communities, and the cluster sizes are ranged from 20 to 30 individuals (`ni = c(20, 30)`). Note that in the example code, `beta = c(-1, 0.5, 0)`, $\beta$ has three value, representing the coefficients of $X, P(t)$ and $X*P(t)$.
+For the example we used here, we have a total 10 clusters (`M = 10`), representing 200 distinct communities, and the cluster sizes are varied between 20 and 30 individuals (`ni = c(20, 30)`). 
 
-- $\beta_1 = -1$ is the coefficient of the main effect (treatment assignment) indicator. -1 refers to  
+Note that in the example code, `beta = c(-1, 0.5, 0)`, $\beta$ has three value, specifying the coefficients of $X, P(t)$ and $X*P(t)$.
+
+- $\beta_1 = -1$ is the coefficient of the main effect (treatment assignment) indicator. -1 indicates that individuals in the treatment group have a lower event hazard, regardless of time period. 
 
 - $\beta_2 = 0.5$ is the coefficient of the effect of the BCPP.
 
 - $\beta_3 = 0$ refers to the interaction coefficient of the interaction of the treatment assignment and the BCPP schedule 0 refers to there is no effect for the interaction.
 
+This simulated dataset will later be used to demonstrate model fitting using `composite_coxIC()`
 
 ## Fitting the Model (without variance estimation)
 
 The function used to fit the model is `composite_coxIC()`. This function obtains composite maximum likelihood estimators based on the marginal Cox regression model [see above]. 
-#` need a citation
+
 ```{r}
 tdc_model_fit <- composite_coxIC(
   formula = Surv(left, right, type = "interval2") ~ treat + utt,
-  data = data,
+  data = data[1:200, ],
   strata = "stratum",
   clus = "group",
   id = "id",
@@ -133,8 +166,6 @@ summary(tdc_model_fit)
 ```
 
 
-```{r}
-```
 
 
 ## Visualizing the Baseline Functions
